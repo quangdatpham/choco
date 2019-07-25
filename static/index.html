@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Realtime Chat</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    
+    <link rel="stylesheet" href="./style.css">
+    
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container text-center">
+        <label for="order-number"><h1>Order Number</h1></label>
+    </div>
+
+    <div class="container control text-center">
+        <div class="row">
+            <div class="col-md-4 col-xs-4">
+                <form class="form-order">
+                    <div class="form-group">
+                        <label for="order-number">Order Number:</label>
+                        <input type="text" class="form-control order-number" id="order-number" style="background-color: slategray; border: none; color: #f7f4ef;">
+                    </div>
+                    <input type="submit" class="btn btn-warning add-order-number" value="Add">
+                </form>
+            </div>
+
+            <div class="col-md-8 col-xs-8 order-number-list"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const formOrder = document.querySelector('.form-order');
+        const orderNumberInput = document.querySelector('.order-number');
+        const socket = io();
+
+        function populateOrderNumbers(orderNumbers) {
+            const list = document.querySelector('.order-number-list');
+            list.innerHTML = orderNumbers.map(orderNumber => `
+                <h2 class="col-md-4 col-xs-4"> ${orderNumber.no} </h2>
+            `).join('');
+        }
+
+        function getOrderNumbers() {
+            fetch('/order-numbers')
+                .then(res => res.json())
+                .then(populateOrderNumbers);
+        }
+
+        function sendOrderNumber(orderNumber) {
+            fetch('/order-numbers', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({ no: parseInt(orderNumber) })
+            })
+            .then(() => {
+                console.log('ok');
+            })
+            .catch(err => {
+                console.log(err);
+            });
+        }
+        
+        getOrderNumbers();
+        orderNumberInput.focus();
+
+        formOrder.addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            sendOrderNumber(orderNumberInput.value);
+            orderNumberInput.value = '';
+        });
+
+        socket.on('order', populateOrderNumbers);
+    </script>
+</body>
+</html>
