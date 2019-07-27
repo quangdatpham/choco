@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Realtime Chat</title>
+    <title>Manager OrderNumber</title>
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
@@ -15,41 +15,54 @@
 </head>
 <body class="manager">
     <div class="container text-center">
-        <label for="order-number"><h1>Order Number</h1></label>
+        <label for="order-number"><h1>Chocopie</h1></label>
     </div>
 
     <div class="container control text-center">
         <div class="row">
-            <div class="col-md-4 col-xs-4">
-                <form class="form-order">
-                    <div class="action-type">
-                        <label for="done" class="action-group">
-                            <input type="radio" class="action-type-item done" id="done" name="status" value="DONE">
-                            <span>Ready to pickup</span>
-                        </label>
+            <div class="col-md-12 col-xs-12">
+                <form class="form-order" autocomplete="off">
+                    <input autocomplete="false" name="hidden" type="text" style="display:none;">
+                    <div class="row control-order">
+                        <div class="col-md-3">
+                            <div class="action-type">
+                                <label for="done" class="action-group">
+                                    <input type="radio" class="action-type-item done" id="done" name="status" value="DONE">
+                                    <span>Ready to pickup</span>
+                                </label>
+                            </div>
+                            <div class="action-type">
+                                <label for="preparing" class="action-group">
+                                    <input type="radio" class="action-type-item preparing" id="preparing" name="status" value="PREPARING" checked>
+                                    <span>Preparing</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="order-number">Order Number:</label>
+                                <input type="text" class="form-control order-number form-input" id="order-number" name="order-number">
+                            </div>
+                            <div class="form-group">
+                                <label for="time">Time</label>
+                                <input type="text" class="form-control time form-input" id="time" name="time">
+                            </div>
+                            <input type="submit" class="btn btn-warning add-order-number" value="Add">
+                        </div>
                     </div>
-                    <div class="action-type">
-                        <label for="preparing" class="action-group">
-                            <input type="radio" class="action-type-item preparing" id="preparing" name="status" value="PREPARING" checked>
-                            <span>Preparing</span>
-                        </label>
-                    </div>
-                    <br />
-                    <div class="form-group">
-                        <label for="order-number">Order Number:</label>
-                        <input type="text" class="form-control order-number form-input" id="order-number" name="order-number">
-                    </div>
-                    <div class="form-group">
-                        <label for="time">Time</label>
-                        <input type="text" class="form-control time form-input" id="time" name="time">
-                    </div>
-                    <input type="submit" class="btn btn-warning add-order-number" value="Add">
                 </form>
             </div>
+        </div>
 
-            <div class="col-md-8 col-xs-8 done-list"></div>
-            <div class="col-md-8 col-xs-8 preparing-list"></div>
-
+        <div class="row">
+            <h1 class='line' style="color: green;">Ready to pickup</h1>
+            <div class="col-md-12 done-list"></div>
+        </div>
+    
+        <div class="row">
+            <h1 class="line" style="color: red;">Preparing</h1>
+            <div class="col-md-12 preparing-list"></div>
         </div>
     </div>
 
@@ -59,18 +72,6 @@
         const formOrder = document.querySelector('.form-order');
         const orderNumberInput = document.querySelector('.order-number');
         const socket = io();
-
-        function populateOrderNumbers(orderNumbers) {
-            const doneList = document.querySelector('.done-list');
-            doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => `
-                <h2 class="col-md-3 col-xs-3"> ${orderNumber.no} </h2>
-            `).join('');
-
-            const preparingList = document.querySelector('.preparing-list');
-            preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => `
-                <h2 class="col-md-3 col-xs-3"> ${orderNumber.no} </h2>
-            `).join('');
-        }
 
         function getOrderNumbers() {
             fetch('/order-numbers')

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Realtime Chat</title>
+    <title>Customer OrderNumber</title>
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
@@ -37,50 +37,6 @@
         const formOrder = document.querySelector('.form-order');
         const orderNumberInput = document.querySelector('.order-number');
         const socket = io();
-
-        function triggerTimer() {
-            const timers = document.querySelectorAll('.timer');
-
-            timers.forEach(timer => {
-                const timerInterval = setInterval(() => {
-                    const timeLeft = timer.textContent.trim();
-
-                    if (timeLeft === '00:00') {
-                        sendOrderNumber({
-                            status: 'DONE',
-                            no: timer.dataset.orderNumber,
-                            time: 0
-                        });
-                        return clearInterval(timerInterval);
-                    }
-                    
-                    timer.textContent = calculateNewTime(timeLeft);
-                }, 1000);
-            });
-        }
-
-        function populateOrderNumbers(orderNumbers) {
-            const doneList = document.querySelector('.done-list');
-            doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => `
-                <h2 class="col-md-3 col-xs-3"> 
-                    <span class="order-number-item">${orderNumber.no ? orderNumber.no : ' '}</span>
-                </h2>
-            `).join('');
-
-            const preparingList = document.querySelector('.preparing-list');
-            preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => `
-                <h2 class="col-md-3 col-xs-3"> 
-                    <span class="order-number-item">
-                        ${orderNumber.no ? orderNumber.no : ' '}
-                        <span class="order-number-item-time ${orderNumber.no ? 'timer': ''}" data-order-number="${orderNumber.no ? orderNumber.no : ' '}">
-                            ${orderNumber.no ? orderNumber.time : ' '}
-                        </span>
-                    </span>
-                </h2>
-            `).join('');
-
-            triggerTimer();
-        }
 
         function getOrderNumbers() {
             fetch('/order-numbers')

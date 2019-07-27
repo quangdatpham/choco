@@ -1,21 +1,12 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-.manager {
-    background: #4d2f00;
-    color: #f7f4ef;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 80vh;
-}
-
-.customer {
     padding: 24px 36px;
     background: #f7f4ef;
     color: lightblue;
+}
+
+.manager {
+    color: #666;
 }
 
 .order-number-item {
@@ -25,6 +16,8 @@ body {
     color: white;
     background-color: rgb(231, 216, 8);
     margin-right: 8px;
+    border-radius: 4px;
+    text-shadow: 4px 4px 12px rgba(0, 0, 0, .2);
 }
 
 .order-number-item-time {
@@ -32,7 +25,10 @@ body {
 }
 
 .action-type {
-    border: 2px solid white;
+    background-color: lightcyan;
+    border-radius: 4px;
+    padding: 4px 18px;
+    margin-bottom: 12px;
 }
 
 .action-group {
@@ -59,5 +55,20 @@ body {
 }
 
 .form-input {
-    background-color: slategray; border: none; color: #f7f4ef;
+    background-color: lightcyan;
+    border: none;
+    font-size: 2rem;
+}
+
+.control-order {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-order {
+    background-color: lightblue;
+    padding: 24px 36px;
+    border-radius: 4px;
+    box-shadow: 2px 2px 12px 0 rgba(0, 0, 0, .1);
 }
