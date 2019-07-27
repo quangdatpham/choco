@@ -24,6 +24,13 @@ function calculateNewTime(time) {
     return `${mins.length === 2 ? mins : '0' + mins}:${secs.length === 2 ? secs : '0' + secs}`;
 }
 
+function limitOrderToSend(limit) {
+    return {
+        'DONE': orderNumbers['DONE'].slice(0, limit),
+        'PREPARING': orderNumbers['PREPARING'].slice(0, limit)
+    };
+}
+
 setInterval(() => {
     orderNumbers['PREPARING'].forEach(orderNumber => {
         const timeLeft = orderNumber.time;
@@ -33,7 +40,7 @@ setInterval(() => {
         if (orderNumber.time === '00:00') {
             orderNumbers['PREPARING'] = orderNumbers['PREPARING'].filter(preparing => preparing.no !== orderNumber.no);
             orderNumbers['DONE'].unshift({ no: orderNumber.no });
-            io.emit('order', orderNumbers);
+            io.emit('order', limitOrderToSend(8));
         }
     })
 }, 1000);
@@ -43,7 +50,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/order-numbers', (req, res) => {
-    res.send(orderNumbers);
+    res.send(limitOrderToSend(8));
 });
 
 app.post('/order-numbers', (req, res) => {
@@ -69,7 +76,7 @@ app.post('/order-numbers', (req, res) => {
         });
     }
 
-    io.emit('order', orderNumbers);
+    io.emit('order', limitOrderToSend(8));
     res.sendStatus(200);
 });
 
