@@ -43,11 +43,6 @@ function triggerTimer() {
             const timeLeft = timer.textContent.trim();
 
             if (timeLeft === '00:00') {
-                sendOrderNumber({
-                    status: 'DONE',
-                    no: timer.dataset.orderNumber,
-                    time: 0
-                });
                 return clearInterval(timerInterval);
             }
             
