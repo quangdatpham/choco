@@ -1,41 +1,41 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-const orderNumbers = [
-    { no: 0 },
-    { no: 0 },
-    { no: 0 }
-];
+const orderNumbers = {
+    'DONE': Array.from({ length: 8 }, () => ({ no: 0, time: 0 })),
+    'PREPARING': Array.from({ length: 8 }, () => ({ no: 0, time: 0 }))
+};
 
 app.use(express.static(__dirname + '/static'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-const OrderStatus = {
-    DONE: 1,
-    PROCESSING: 2,
-    DELIVERED: 3
-};
 
 app.get('/order-numbers', (req, res) => {
     res.send(orderNumbers);
 });
 
 app.post('/order-numbers', (req, res) => {
-    const { no } = req.body;
-    
+    const { no, status, time } = req.body;
+
+    console.log('post orderNumber', req.body);
+
     if ( !no) return;
+    if (!orderNumbers[status]) return;
+    if (time === undefined || time === '') return;
 
-    // orderNumber.status = OrderStatus.PROCESSING;
+    if (status === 'DONE') {
+        orderNumbers['PREPARING'] = orderNumbers['PREPARING'].filter(preparing => preparing.no !== no);
+        orderNumbers['PREPARING'].push({ no: 0, time: 0 });
+    }
     
-    console.log('post orderNumber', no);
-
-    orderNumbers.unshift({ no });
-    orderNumbers.pop();
+    orderNumbers[status].unshift({ 
+        no: parseInt(no),
+        time: parseInt(time)
+    });
+    orderNumbers[status].pop();
 
     io.emit('order', orderNumbers);
     res.sendStatus(200);

@@ -12,29 +12,74 @@
     <link rel="stylesheet" href="./style.css">
     <script src="/socket.io/socket.io.js"></script>
 </head>
-<body>
-    <div class="container text-center">
-        <h1>Order Number</h1>
-    </div>
+<body class="customer">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="row">
+                <h1 class='line' style="color: green;">Ready to pickup</h1>
+                <div class="col-md-12 done-list"></div>
+            </div>
+        
+            <div class="row">
+                <h1 class="line" style="color: red;">Preparing</h1>
+                <div class="col-md-12 preparing-list"></div>
+            </div>
+        </div>
 
-    <div class="container control text-center">
-        <div class="row">
-
-            <div class="col-md-12 order-number-list"></div>
-
+        <div class="col-md-2 logo-container">
+            <img src="b.png" alt="logo" class="logo">
         </div>
     </div>
+
+    <script src="index.js"></script>
 
     <script>
         const formOrder = document.querySelector('.form-order');
         const orderNumberInput = document.querySelector('.order-number');
         const socket = io();
 
+        function triggerTimer() {
+            const timers = document.querySelectorAll('.timer');
+
+            timers.forEach(timer => {
+                const timerInterval = setInterval(() => {
+                    const timeLeft = timer.textContent.trim();
+
+                    if (timeLeft === '00:00') {
+                        sendOrderNumber({
+                            status: 'DONE',
+                            no: timer.dataset.orderNumber,
+                            time: 0
+                        });
+                        return clearInterval(timerInterval);
+                    }
+                    
+                    timer.textContent = calculateNewTime(timeLeft);
+                }, 1000);
+            });
+        }
+
         function populateOrderNumbers(orderNumbers) {
-            const list = document.querySelector('.order-number-list');
-            list.innerHTML = orderNumbers.map(orderNumber => `
-                <h2 class="col-md-4 col-xs-4 order-number-item"> ${orderNumber.no} </h2>
+            const doneList = document.querySelector('.done-list');
+            doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => `
+                <h2 class="col-md-3 col-xs-3"> 
+                    <span class="order-number-item">${orderNumber.no ? orderNumber.no : ' '}</span>
+                </h2>
             `).join('');
+
+            const preparingList = document.querySelector('.preparing-list');
+            preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => `
+                <h2 class="col-md-3 col-xs-3"> 
+                    <span class="order-number-item">
+                        ${orderNumber.no ? orderNumber.no : ' '}
+                        <span class="order-number-item-time ${orderNumber.no ? 'timer': ''}" data-order-number="${orderNumber.no ? orderNumber.no : ' '}">
+                            ${orderNumber.no ? orderNumber.time : ' '}
+                        </span>
+                    </span>
+                </h2>
+            `).join('');
+
+            triggerTimer();
         }
 
         function getOrderNumbers() {

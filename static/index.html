@@ -13,7 +13,7 @@
     
     <script src="/socket.io/socket.io.js"></script>
 </head>
-<body>
+<body class="manager">
     <div class="container text-center">
         <label for="order-number"><h1>Order Number</h1></label>
     </div>
@@ -22,18 +22,38 @@
         <div class="row">
             <div class="col-md-4 col-xs-4">
                 <form class="form-order">
+                    <div class="action-type">
+                        <label for="done" class="action-group">
+                            <input type="radio" class="action-type-item done" id="done" name="status" value="DONE">
+                            <span>Ready to pickup</span>
+                        </label>
+                    </div>
+                    <div class="action-type">
+                        <label for="preparing" class="action-group">
+                            <input type="radio" class="action-type-item preparing" id="preparing" name="status" value="PREPARING" checked>
+                            <span>Preparing</span>
+                        </label>
+                    </div>
+                    <br />
                     <div class="form-group">
                         <label for="order-number">Order Number:</label>
-                        <input type="text" class="form-control order-number" id="order-number" style="background-color: slategray; border: none; color: #f7f4ef;">
+                        <input type="text" class="form-control order-number form-input" id="order-number" name="order-number">
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="text" class="form-control time form-input" id="time" name="time">
                     </div>
                     <input type="submit" class="btn btn-warning add-order-number" value="Add">
                 </form>
             </div>
 
-            <div class="col-md-8 col-xs-8 order-number-list"></div>
+            <div class="col-md-8 col-xs-8 done-list"></div>
+            <div class="col-md-8 col-xs-8 preparing-list"></div>
 
         </div>
     </div>
+
+    <script src="index.js"></script>
 
     <script>
         const formOrder = document.querySelector('.form-order');
@@ -41,9 +61,14 @@
         const socket = io();
 
         function populateOrderNumbers(orderNumbers) {
-            const list = document.querySelector('.order-number-list');
-            list.innerHTML = orderNumbers.map(orderNumber => `
-                <h2 class="col-md-4 col-xs-4"> ${orderNumber.no} </h2>
+            const doneList = document.querySelector('.done-list');
+            doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => `
+                <h2 class="col-md-3 col-xs-3"> ${orderNumber.no} </h2>
+            `).join('');
+
+            const preparingList = document.querySelector('.preparing-list');
+            preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => `
+                <h2 class="col-md-3 col-xs-3"> ${orderNumber.no} </h2>
             `).join('');
         }
 
@@ -52,32 +77,24 @@
                 .then(res => res.json())
                 .then(populateOrderNumbers);
         }
-
-        function sendOrderNumber(orderNumber) {
-            fetch('/order-numbers', {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({ no: parseInt(orderNumber) })
-            })
-            .then(() => {
-                console.log('ok');
-            })
-            .catch(err => {
-                console.log(err);
-            });
-        }
         
         getOrderNumbers();
         orderNumberInput.focus();
 
         formOrder.addEventListener('submit', function (e) {
             e.preventDefault();
+            const status = this.elements.preparing.checked ? 'PREPARING' : 'DONE';
+
+            const orderNumber = {
+                no: this.elements['order-number'].value,
+                time: this.elements.time.value,
+                status
+            }
             
-            sendOrderNumber(orderNumberInput.value);
-            orderNumberInput.value = '';
+            sendOrderNumber(orderNumber);
+            this.elements['order-number'].value = '';
+            this.elements.time.value = '';
+            this.elements['order-number'].focus();
         });
 
         socket.on('order', populateOrderNumbers);
