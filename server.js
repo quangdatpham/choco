@@ -60,11 +60,19 @@ app.post('/order-numbers', (req, res) => {
 
     if ( !no) return;
     if (!orderNumbers[status]) return;
-    if (time === undefined || time === '' || isNaN(parseInt(time)) || time < 1) return;
 
     if (status === 'DONE') {
         orderNumbers['PREPARING'] = orderNumbers['PREPARING'].filter(preparing => preparing.no !== no);
+        orderNumbers['DONE'].unshift({ 
+            no: parseInt(no),
+            time
+        });
+
+        io.emit('order', limitOrderToSend(8));
+        return res.sendStatus(200);
     }
+
+    if (time === undefined || time === '' || isNaN(parseInt(time)) || time < 1) return;
     
     const existing  = orderNumbers[status].find(o => o.no === no);
     if (existing) {

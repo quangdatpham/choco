@@ -53,23 +53,31 @@ function triggerTimer() {
 
 function populateOrderNumbers(orderNumbers) {
     const doneList = document.querySelector('.done-list');
-    doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => `
-        <h2 class="col-md-3 col-xs-3"> 
-            <span class="order-number-item">${orderNumber.no ? orderNumber.no : ' '}</span>
-        </h2>
-    `).join('');
+    doneList.innerHTML = orderNumbers['DONE'].map(orderNumber => {
+        const orderNumberFontSize = 16 - String(orderNumber.no).length;
+
+        return `
+            <h2 class="col-md-3 col-xs-3"> 
+                <span class="order-number-item" style="font-size: ${orderNumberFontSize}rem;">${orderNumber.no ? orderNumber.no : ' '}</span>
+            </h2>
+        `;
+    }).join('');
 
     const preparingList = document.querySelector('.preparing-list');
-    preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => `
-        <h2 class="col-md-3 col-xs-3"> 
-            <span class="order-number-item">
-                ${orderNumber.no ? orderNumber.no : ' '}
-                <span class="order-number-item-time ${orderNumber.no ? 'timer': ''}" data-order-number="${orderNumber.no ? orderNumber.no : ' '}">
-                    ${orderNumber.no ? orderNumber.time : ' '}
+    preparingList.innerHTML = orderNumbers['PREPARING'].map(orderNumber => {
+        const orderNumberFontSize = 16 - String(orderNumber.no).length;
+
+        return `
+            <h2 class="col-md-3 col-xs-3"> 
+                <span class="order-number-item">
+                    <span style="font-size: ${orderNumberFontSize}rem;">${orderNumber.no ? orderNumber.no : ' '}</span>
+                    <span class="order-number-item-time ${orderNumber.no ? 'timer': ''}" data-order-number="${orderNumber.no ? orderNumber.no : ' '}">
+                        ${orderNumber.no ? orderNumber.time : ' '}
+                    </span>
                 </span>
-            </span>
-        </h2>
-    `).join('');
+            </h2>
+        `;
+    }).join('');
 
     triggerTimer();
 }

@@ -9,10 +9,18 @@ body {
     color: #666;
 }
 
+.customer {
+    height: 100vh;
+}
+
 .order-number-item {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     text-align: center;
     font-size: 12rem;
+    height: 140px;
     color: white;
     background-color: rgb(231, 216, 8);
     margin-right: 8px;
